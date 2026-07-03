@@ -8,18 +8,19 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 
-
-
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAll", policy =>
+    options.AddPolicy("AllowReactAndFlutter", policy =>
     {
         policy
+            .WithOrigins(
+                "http://localhost:5173",
+                "https://disaster-alert-api-zup2.onrender.com"
+            )
             .AllowAnyHeader()
             .AllowAnyMethod()
-            .SetIsOriginAllowed(_ => true)
             .AllowCredentials();
     });
 });
@@ -112,17 +113,19 @@ app.UseSwaggerUI(c =>
     c.RoutePrefix = "swagger";
 });
 
-// IMPORTANT:
-// Disable HTTPS redirection for now because you are testing from phone over local HTTP
 // app.UseHttpsRedirection();
 
-app.UseCors("AllowAll");
+app.UseStaticFiles();
+
+app.UseRouting();
+
+app.UseCors("AllowReactAndFlutter");
 
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapControllers();
-app.MapHub<ChatHub>("/hubs/chat");
-app.MapHub<AlertsHub>("/hubs/alerts");
-app.UseStaticFiles();
+app.MapControllers().RequireCors("AllowReactAndFlutter");
+app.MapHub<ChatHub>("/hubs/chat").RequireCors("AllowReactAndFlutter");
+app.MapHub<AlertsHub>("/hubs/alerts").RequireCors("AllowReactAndFlutter");
+
 app.Run();
