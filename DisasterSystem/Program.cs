@@ -125,4 +125,4 @@ app.MapControllers();
 app.MapHub<ChatHub>("/hubs/chat");
 app.MapHub<AlertsHub>("/hubs/alerts");
 app.UseStaticFiles();
-app.Run("http://0.0.0.0:5083");
+app.Run();
