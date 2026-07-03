@@ -92,19 +92,22 @@ namespace DisasterSystem.API.Controllers
 
         [Authorize]
         [HttpGet("me")]
-        public IActionResult Me()
+        public async Task<IActionResult> Me()
         {
-            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            var name = User.FindFirst(ClaimTypes.Name)?.Value;
-            var email = User.FindFirst(ClaimTypes.Email)?.Value;
-            var role = User.FindFirst(ClaimTypes.Role)?.Value;
+            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+
+            var user = await _context.Users.FindAsync(userId);
+
+            if (user == null)
+                return NotFound("User not found.");
 
             return Ok(new
             {
-                UserId = userId,
-                Name = name,
-                Email = email,
-                Role = role
+                UserId = user.Id,
+                Name = user.Name,
+                Email = user.Email,
+                Role = user.Role,
+                PhotoUrl = user.PhotoUrl
             });
         }
 

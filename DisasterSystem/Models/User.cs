@@ -1,4 +1,7 @@
-﻿namespace DisasterSystem.API.Models
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+
+namespace DisasterSystem.API.Models
 {
     public class User
     {
@@ -9,14 +12,17 @@
         public string Role { get; set; } = "User";
         public int Reputation { get; set; } = 0;
         public DateTime CreatedAt { get; set; }
-        public string? PhotoUrl { get; set; }
+        
 
         public bool IsBanned { get; set; } = false;
 
         public double? Latitude { get; set; }
         public double? Longitude { get; set; }
         public string? FcmToken { get; set; }
-        public List<Report> Reports { get; set; } = new();
+
+        [Column("photo_url")]
+        public string? PhotoUrl { get; set; }
+    public List<Report> Reports { get; set; } = new();
         public List<ReportVote> ReportVotes { get; set; } = new();
         public List<Notification> Notifications { get; set; } = new();
     }
