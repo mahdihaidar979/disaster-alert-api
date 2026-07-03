@@ -14,10 +14,19 @@ namespace DisasterSystem.API.Services
 
             if (FirebaseApp.DefaultInstance == null)
             {
+                var firebaseJson = Environment.GetEnvironmentVariable("FIREBASE_SERVICE_ACCOUNT_JSON");
+
+                if (string.IsNullOrWhiteSpace(firebaseJson))
+                {
+                    throw new Exception("FIREBASE_SERVICE_ACCOUNT_JSON environment variable is missing.");
+                }
+
                 FirebaseApp.Create(new AppOptions
                 {
-                    Credential = GoogleCredential.FromFile("firebase-service-account.json")
+                    Credential = GoogleCredential.FromJson(firebaseJson)
                 });
+
+                _logger.LogInformation("Firebase initialized successfully from Render environment variable.");
             }
         }
 
