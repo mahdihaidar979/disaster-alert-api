@@ -9,6 +9,7 @@
         public string Role { get; set; } = "User";
         public int Reputation { get; set; } = 0;
         public DateTime CreatedAt { get; set; }
+        public string? PhotoUrl { get; set; }
 
         public bool IsBanned { get; set; } = false;
 
