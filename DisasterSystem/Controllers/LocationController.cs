@@ -40,6 +40,9 @@ namespace DisasterSystem.API.Controllers
             if (user.IsBanned)
                 return Unauthorized("Your account has been banned.");
 
+            if (!user.LocationTrackingEnabled)
+                return BadRequest("Location tracking is disabled.");
+
             if (dto.Latitude < -90 || dto.Latitude > 90)
                 return BadRequest("Invalid latitude.");
 
@@ -74,6 +77,7 @@ namespace DisasterSystem.API.Controllers
 
             user.Latitude = dto.Latitude;
             user.Longitude = dto.Longitude;
+            user.LocationTrackingEnabled = true;
 
             await _context.SaveChangesAsync();
 
@@ -142,6 +146,7 @@ namespace DisasterSystem.API.Controllers
 
             user.Latitude = null;
             user.Longitude = null;
+            user.LocationTrackingEnabled = false;
 
             await _context.SaveChangesAsync();
 

@@ -15,6 +15,7 @@ namespace DisasterSystem.API.Models
         
 
         public bool IsBanned { get; set; } = false;
+        public bool LocationTrackingEnabled { get; set; } = true;
 
         public double? Latitude { get; set; }
         public double? Longitude { get; set; }
