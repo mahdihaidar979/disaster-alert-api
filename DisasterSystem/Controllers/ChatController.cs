@@ -38,9 +38,11 @@ namespace DisasterSystem.API.Controllers
 
             var messages = await _context.ChatMessages
                 .AsNoTracking()
-                .Where(x =>
-                    x.Channel == channel &&
-                    x.CreatedAt >= expireTime)
+               .Where(x =>
+    x.Channel == channel &&
+    x.CreatedAt >= expireTime &&
+    !x.IsDeleted)
+
                 .OrderByDescending(x => x.CreatedAt)
                 .Take(100)
                 .OrderBy(x => x.CreatedAt)
@@ -57,6 +59,8 @@ namespace DisasterSystem.API.Controllers
 
             var userName =
                 User.FindFirst(ClaimTypes.Name)?.Value ?? "User";
+
+            var role = User.FindFirst(ClaimTypes.Role)?.Value ?? "User";
 
             if (string.IsNullOrWhiteSpace(userIdClaim))
                 return Unauthorized("Invalid token.");
@@ -77,7 +81,10 @@ namespace DisasterSystem.API.Controllers
                 UserName = userName,
                 Message = dto.Message.Trim(),
                 Channel = channel,
-                CreatedAt = DateTime.UtcNow
+                CreatedAt = DateTime.UtcNow,
+                IsAdminMessage = role == "Admin",
+                IsDeleted = false,
+                IsPinned = false
             };
 
             _context.ChatMessages.Add(message);
@@ -90,5 +97,79 @@ namespace DisasterSystem.API.Controllers
 
             return Ok(message);
         }
+
+        [Authorize(Roles = "Admin")]
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteMessage(int id)
+        {
+            var message = await _context.ChatMessages.FindAsync(id);
+
+            if (message == null)
+                return NotFound("Message not found.");
+
+            message.IsDeleted = true;
+
+            await _context.SaveChangesAsync();
+
+            await _hubContext.Clients.All.SendAsync("ChatMessageDeleted", id);
+
+            return Ok(new { message = "Message deleted successfully" });
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpPut("{id}/pin")]
+        public async Task<IActionResult> TogglePinMessage(int id)
+        {
+            var message = await _context.ChatMessages.FindAsync(id);
+
+            if (message == null)
+                return NotFound("Message not found.");
+
+            message.IsPinned = !message.IsPinned;
+
+            await _context.SaveChangesAsync();
+
+            await _hubContext.Clients.All.SendAsync("ChatMessagePinned", message);
+
+            return Ok(message);
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpPost("admin-warning")]
+        public async Task<IActionResult> SendAdminWarning(SendChatMessageDto dto)
+        {
+            var adminId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var adminName = User.FindFirst(ClaimTypes.Name)?.Value ?? "Admin";
+
+            if (string.IsNullOrWhiteSpace(adminId))
+                return Unauthorized("Invalid token.");
+
+            if (string.IsNullOrWhiteSpace(dto.Message))
+                return BadRequest("Message is required.");
+
+            var channel = string.IsNullOrWhiteSpace(dto.Channel)
+                ? "general"
+                : dto.Channel.Trim();
+
+            var message = new ChatMessage
+            {
+                UserId = int.Parse(adminId),
+                UserName = adminName,
+                Message = dto.Message.Trim(),
+                Channel = channel,
+                CreatedAt = DateTime.UtcNow,
+                IsAdminMessage = true,
+                IsDeleted = false,
+                IsPinned = true
+            };
+
+            _context.ChatMessages.Add(message);
+            await _context.SaveChangesAsync();
+
+            await _hubContext.Clients.All.SendAsync("ReceiveChatMessage", message);
+
+            return Ok(message);
+        }
     }
+
 }

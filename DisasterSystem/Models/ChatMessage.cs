@@ -14,5 +14,8 @@
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         public User? User { get; set; }
+        public bool IsDeleted { get; set; } = false;
+        public bool IsPinned { get; set; } = false;
+        public bool IsAdminMessage { get; set; } = false;
     }
 }
