@@ -44,6 +44,7 @@ builder.Services.AddSingleton<FcmService>();
 builder.Services.AddHttpClient<GooglePlacesService>();
 builder.Services.AddScoped<AdminLogService>();
 
+builder.Services.AddSignalR();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
@@ -122,8 +123,6 @@ app.UseCors("AllowReactAndFlutter");
 
 app.UseAuthentication();
 app.UseAuthorization();
-
-builder.Services.AddSignalR();
 
 app.MapControllers().RequireCors("AllowReactAndFlutter");
 app.MapHub<ChatHub>("/hubs/chat").RequireCors("AllowReactAndFlutter");
