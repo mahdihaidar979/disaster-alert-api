@@ -187,6 +187,33 @@ namespace DisasterSystem.API.Controllers
             }
         }
 
+
+        private object BuildRealtimeReportPayload(Report report)
+        {
+            var latitude = report.Location != null ? report.Location.Coordinate.Y : 0;
+            var longitude = report.Location != null ? report.Location.Coordinate.X : 0;
+
+            return new
+            {
+                report.Id,
+                report.Type,
+                report.Description,
+                report.Severity,
+                report.Score,
+                report.Status,
+                report.AiConfidence,
+                report.AiPrediction,
+                report.AiReason,
+                report.CreatedAt,
+                report.UserId,
+                UserName = report.User != null ? report.User.Name : null,
+                Latitude = latitude,
+                Longitude = longitude,
+                report.ImageUrl,
+                VotesCount = report.ReportVotes != null ? report.ReportVotes.Count : 0
+            };
+        }
+
         [HttpGet("reports/all")]
         public async Task<IActionResult> GetAllReports()
         {
@@ -309,6 +336,7 @@ namespace DisasterSystem.API.Controllers
 
             var report = await _context.Reports
                 .Include(r => r.User)
+                .Include(r => r.ReportVotes)
                 .FirstOrDefaultAsync(r => r.Id == id);
 
             if (report == null)
@@ -330,25 +358,24 @@ namespace DisasterSystem.API.Controllers
 
             await _context.SaveChangesAsync();
 
-            await _hubContext.Clients.All.SendAsync("ReportStatusUpdated", new
-            {
-                report.Id,
-                report.Status
-            });
-
             if (oldStatus != "Verified" && dto.Status == "Verified")
             {
                 await SendNotificationsForVerifiedReport(report);
-                await _context.SaveChangesAsync();
             }
+
+            await _hubContext.Clients.All.SendAsync(
+                "ReportStatusUpdated",
+                BuildRealtimeReportPayload(report)
+            );
 
             return Ok(new
             {
-                message = "Report status updated successfully"
+                message = "Report status updated successfully",
+                report = BuildRealtimeReportPayload(report)
             });
         }
 
-       
+
 
         private async Task SendNotificationsForVerifiedReport(Report report)
         {
@@ -423,7 +450,10 @@ namespace DisasterSystem.API.Controllers
         [HttpDelete("reports/{id}")]
         public async Task<IActionResult> DeleteReport(int id)
         {
-            var report = await _context.Reports.FindAsync(id);
+            var report = await _context.Reports
+                .Include(r => r.User)
+                .Include(r => r.ReportVotes)
+                .FirstOrDefaultAsync(r => r.Id == id);
 
             if (report == null)
                 return NotFound("Report not found.");
@@ -439,12 +469,15 @@ namespace DisasterSystem.API.Controllers
                 $"Deleted report #{report.Id}"
             );
 
+            var deletedReportPayload = BuildRealtimeReportPayload(report);
+
             _context.Reports.Remove(report);
             await _context.SaveChangesAsync();
 
             await _hubContext.Clients.All.SendAsync("ReportDeleted", new
             {
-                reportId = id
+                reportId = id,
+                report = deletedReportPayload
             });
 
             return Ok(new
@@ -456,7 +489,7 @@ namespace DisasterSystem.API.Controllers
         [HttpPut("users/{id}/role")]
         public async Task<IActionResult> UpdateUserRole(int id, [FromBody] string role)
         {
-            var allowedRoles = new[] { "Admin", "User"};
+            var allowedRoles = new[] { "Admin", "User" };
 
             if (!allowedRoles.Contains(role))
                 return BadRequest("Invalid role.");
