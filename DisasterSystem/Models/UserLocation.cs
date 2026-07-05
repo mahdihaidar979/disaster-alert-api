@@ -13,4 +13,5 @@ public class UserLocation
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 
     public User User { get; set; } = null!;
+    public bool IsOnline { get; set; } = true;
 }

@@ -57,7 +57,8 @@ namespace DisasterSystem.API.Controllers
                     UserId = userId,
                     Latitude = dto.Latitude,
                     Longitude = dto.Longitude,
-                    UpdatedAt = DateTime.UtcNow
+                    UpdatedAt = DateTime.UtcNow,
+                    IsOnline = true
                 };
 
                 _context.UserLocation.Add(existing);
@@ -67,6 +68,8 @@ namespace DisasterSystem.API.Controllers
                 existing.Latitude = dto.Latitude;
                 existing.Longitude = dto.Longitude;
                 existing.UpdatedAt = DateTime.UtcNow;
+                existing.IsOnline = true;
+
             }
 
             user.Latitude = dto.Latitude;
@@ -105,7 +108,7 @@ namespace DisasterSystem.API.Controllers
                         UserRole = x.User.Role,
                         IsBanned = x.User.IsBanned,
 
-                        IsOnline = x.UpdatedAt >= DateTime.UtcNow.AddMinutes(-5)
+                        IsOnline = x.IsOnline
                     })
                     .ToListAsync();
 
@@ -133,7 +136,8 @@ namespace DisasterSystem.API.Controllers
 
             if (existing != null)
             {
-                _context.UserLocation.Remove(existing);
+                existing.IsOnline = false;
+                existing.UpdatedAt = DateTime.UtcNow;
             }
 
             user.Latitude = null;
