@@ -14,6 +14,11 @@ namespace DisasterSystem.API.Controllers
     {
         private readonly ApplicationDbContext _context;
 
+        private static DateTime ToLebanonTime(DateTime utcDate)
+        {
+            return utcDate.AddHours(3);
+        }
+
         public SafetyCheckInsController(ApplicationDbContext context)
         {
             _context = context;

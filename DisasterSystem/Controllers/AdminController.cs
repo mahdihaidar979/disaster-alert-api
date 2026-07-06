@@ -21,6 +21,11 @@ namespace DisasterSystem.API.Controllers
         private readonly FcmService _fcmService;
         private readonly AdminLogService _adminLogService;
 
+        private static DateTime ToLebanonTime(DateTime utcDate)
+        {
+            return utcDate.AddHours(3);
+        }
+
         public AdminController(
             ApplicationDbContext context,
             IHubContext<AlertsHub> hubContext,
@@ -133,7 +138,7 @@ namespace DisasterSystem.API.Controllers
                     r.AiConfidence,
                     r.AiPrediction,
                     r.AiReason,
-                    r.CreatedAt,
+                    CreatedAt = ToLebanonTime(r.CreatedAt),
                     r.UserId,
                     UserName = r.User != null ? r.User.Name : null,
                     Latitude = r.Location != null ? r.Location.Coordinate.Y : 0,
@@ -204,7 +209,7 @@ namespace DisasterSystem.API.Controllers
                 report.AiConfidence,
                 report.AiPrediction,
                 report.AiReason,
-                report.CreatedAt,
+                CreatedAt = ToLebanonTime(report.CreatedAt),
                 report.UserId,
                 UserName = report.User != null ? report.User.Name : null,
                 Latitude = latitude,
@@ -242,7 +247,7 @@ namespace DisasterSystem.API.Controllers
                     r.AiConfidence,
                     r.AiPrediction,
                     r.AiReason,
-                    r.CreatedAt,
+                    CreatedAt = ToLebanonTime(r.CreatedAt),
                     r.UserId,
                     UserName = r.User != null ? r.User.Name : null,
                     Latitude = latitude,
@@ -290,7 +295,7 @@ namespace DisasterSystem.API.Controllers
                     r.AiConfidence,
                     r.AiPrediction,
                     r.AiReason,
-                    r.CreatedAt,
+                    CreatedAt = ToLebanonTime(r.CreatedAt),
                     r.UserId,
                     UserName = r.User != null ? r.User.Name : null,
                     Latitude = latitude,
