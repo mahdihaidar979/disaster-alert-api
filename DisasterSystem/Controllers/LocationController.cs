@@ -91,6 +91,29 @@ namespace DisasterSystem.API.Controllers
             });
         }
 
+        [Authorize]
+        [HttpPost("enable")]
+        public async Task<IActionResult> EnableLocation()
+        {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (string.IsNullOrWhiteSpace(userIdClaim))
+                return Unauthorized("Invalid token.");
+
+            var userId = int.Parse(userIdClaim);
+
+            var user = await _context.Users.FindAsync(userId);
+
+            if (user == null)
+                return NotFound("User not found.");
+
+            user.LocationTrackingEnabled = true;
+
+            await _context.SaveChangesAsync();
+
+            return Ok(new { message = "Location tracking enabled" });
+        }
+
         [Authorize(Roles = "Admin")]
         [HttpGet("live")]
         public async Task<IActionResult> GetLiveLocations()
