@@ -18,10 +18,6 @@ namespace DisasterSystem.API.Controllers
         private readonly ApplicationDbContext _context;
         private readonly IHubContext<ChatHub> _hubContext;
 
-        private static DateTime ToLebanonTime(DateTime utcDate)
-        {
-            return utcDate.AddHours(3);
-        }
 
         public ChatController(
             ApplicationDbContext context,

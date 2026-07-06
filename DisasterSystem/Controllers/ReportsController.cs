@@ -21,10 +21,6 @@ namespace DisasterSystem.API.Controllers
         private readonly IHubContext<AlertsHub> _hubContext;
         private readonly FcmService _fcmService;
 
-        private static DateTime ToLebanonTime(DateTime utcDate)
-        {
-            return utcDate.AddHours(3);
-        }
 
         public ReportsController(
             ApplicationDbContext context,
@@ -273,7 +269,7 @@ namespace DisasterSystem.API.Controllers
                     report.Description,
                     report.Severity,
                     report.Status,
-                    CreatedAt = ToLebanonTime(report.CreatedAt),
+                    report.CreatedAt,
                     report.AiConfidence,
                     report.AiPrediction,
                     UserName = user.Name,
@@ -308,7 +304,7 @@ namespace DisasterSystem.API.Controllers
                     report.Description,
                     report.Severity,
                     report.Status,
-                    CreatedAt = ToLebanonTime(report.CreatedAt),
+                    report.CreatedAt,
                     report.AiConfidence,
                     report.AiPrediction,
                     report.ImageUrl,
@@ -353,7 +349,7 @@ namespace DisasterSystem.API.Controllers
                 r.AiConfidence,
                 r.AiPrediction,
                 r.Status,
-                CreatedAt = ToLebanonTime(r.CreatedAt),
+                r.CreatedAt,
                 r.ImageUrl,
                 Latitude = r.Location != null ? r.Location.Coordinate.Y : 0,
                 Longitude = r.Location != null ? r.Location.Coordinate.X : 0
@@ -399,7 +395,7 @@ namespace DisasterSystem.API.Controllers
                     r.AiConfidence,
                     r.AiPrediction,
                     r.Status,
-                    CreatedAt = ToLebanonTime(r.CreatedAt),
+                    r.CreatedAt,
                     r.ImageUrl,
                     Latitude = r.Location != null ? r.Location.Coordinate.Y : 0,
                     Longitude = r.Location != null ? r.Location.Coordinate.X : 0
@@ -435,7 +431,7 @@ namespace DisasterSystem.API.Controllers
                     r.Severity,
                     r.Score,
                     r.Status,
-                    CreatedAt = ToLebanonTime(r.CreatedAt),
+                    r.CreatedAt,
                     r.ImageUrl,
                     r.AiConfidence,
                     r.AiPrediction,
