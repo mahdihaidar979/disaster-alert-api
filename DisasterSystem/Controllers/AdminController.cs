@@ -404,21 +404,34 @@ namespace DisasterSystem.API.Controllers
 
                 if (distanceInMeters <= 5000)
                 {
-                    _context.Notifications.Add(new Notification
+                    var notification = new Notification
                     {
                         UserId = user.Id,
                         Title = "Verified Nearby Disaster Alert",
                         Message =
-                            $"⚠️ {report.Type} has been verified by admin.\n" +
-                            $"Severity: {report.Severity}/4\n" +
-                            $"Distance: {(distanceInMeters / 1000):0.00} km away\n" +
-                            $"Status: {report.Status}\n" +
-                            $"Photo: {(string.IsNullOrWhiteSpace(report.ImageUrl) ? "No photo attached" : "Photo attached")}\n" +
-                            $"Description: {(string.IsNullOrWhiteSpace(report.Description) ? "No description provided" : report.Description)}",
+        $"⚠️ {report.Type} has been verified by admin.\n" +
+        $"Severity: {report.Severity}/4\n" +
+        $"Distance: {(distanceInMeters / 1000):0.00} km away\n" +
+        $"Status: {report.Status}\n" +
+        $"Photo: {(string.IsNullOrWhiteSpace(report.ImageUrl) ? "No photo attached" : "Photo attached")}\n" +
+        $"Description: {(string.IsNullOrWhiteSpace(report.Description) ? "No description provided" : report.Description)}",
                         IsRead = false,
                         CreatedAt = DateTime.UtcNow,
                         Latitude = report.Location.Y,
                         Longitude = report.Location.X
+                    };
+
+                    _context.Notifications.Add(notification);
+
+                    await _hubContext.Clients.All.SendAsync("ReceiveNotification", new
+                    {
+                        notification.UserId,
+                        notification.Title,
+                        notification.Message,
+                        notification.IsRead,
+                        notification.CreatedAt,
+                        notification.Latitude,
+                        notification.Longitude
                     });
 
                     if (!string.IsNullOrWhiteSpace(user.FcmToken) &&

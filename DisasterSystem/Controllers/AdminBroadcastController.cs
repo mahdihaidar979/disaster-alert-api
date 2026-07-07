@@ -5,6 +5,8 @@ using DisasterSystem.API.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using DisasterSystem.API.Hubs;
+using Microsoft.AspNetCore.SignalR;
 
 namespace DisasterSystem.API.Controllers
 {
@@ -15,14 +17,20 @@ namespace DisasterSystem.API.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly FcmService _fcmService;
+        private readonly IHubContext<AlertsHub> _hubContext;
 
 
         public AdminBroadcastController(
             ApplicationDbContext context,
-            FcmService fcmService)
+            FcmService fcmService,
+            IHubContext<AlertsHub> hubContext
+            )
+
         {
             _context = context;
             _fcmService = fcmService;
+            _hubContext = hubContext;
+
         }
 
         [HttpPost]
@@ -45,13 +53,24 @@ namespace DisasterSystem.API.Controllers
 
                 foreach (var user in users)
                 {
-                    _context.Notifications.Add(new Notification
+                    var notification = new Notification
                     {
                         UserId = user.Id,
                         Title = dto.Title,
                         Message = dto.Message,
                         IsRead = false,
                         CreatedAt = DateTime.UtcNow
+                    };
+
+                    _context.Notifications.Add(notification);
+
+                    await _hubContext.Clients.All.SendAsync("ReceiveNotification", new
+                    {
+                        notification.UserId,
+                        notification.Title,
+                        notification.Message,
+                        notification.IsRead,
+                        notification.CreatedAt
                     });
                 }
 
