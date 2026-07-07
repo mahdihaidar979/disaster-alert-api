@@ -23,7 +23,9 @@ namespace DisasterSystem.API.Models
 
         [Column("photo_url")]
         public string? PhotoUrl { get; set; }
-    public List<Report> Reports { get; set; } = new();
+        public byte[]? PhotoBytes { get; set; }
+        public string? PhotoContentType { get; set; }
+        public List<Report> Reports { get; set; } = new();
         public List<ReportVote> ReportVotes { get; set; } = new();
         public List<Notification> Notifications { get; set; } = new();
     }

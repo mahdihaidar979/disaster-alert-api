@@ -31,25 +31,12 @@ public class ProfileController : ControllerBase
         if (user == null)
             return NotFound("User not found");
 
-        var folderPath = Path.Combine(
-            Directory.GetCurrentDirectory(),
-            "wwwroot",
-            "uploads",
-            "profile"
-        );
+        using var memoryStream = new MemoryStream();
+        await photo.CopyToAsync(memoryStream);
 
-        if (!Directory.Exists(folderPath))
-            Directory.CreateDirectory(folderPath);
-
-        var fileName = $"{Guid.NewGuid()}{Path.GetExtension(photo.FileName)}";
-        var filePath = Path.Combine(folderPath, fileName);
-
-        using (var stream = new FileStream(filePath, FileMode.Create))
-        {
-            await photo.CopyToAsync(stream);
-        }
-
-        user.PhotoUrl = $"/uploads/profile/{fileName}";
+        user.PhotoBytes = memoryStream.ToArray();
+        user.PhotoContentType = photo.ContentType;
+        user.PhotoUrl = $"/api/Profile/photo/{user.Id}";
 
         await _context.SaveChangesAsync();
 
@@ -80,5 +67,20 @@ public class ProfileController : ControllerBase
             return NotFound("User not found");
 
         return Ok(user);
+    }
+
+    [AllowAnonymous]
+    [HttpGet("photo/{userId}")]
+    public async Task<IActionResult> GetProfilePhoto(int userId)
+    {
+        var user = await _context.Users.FindAsync(userId);
+
+        if (user == null || user.PhotoBytes == null || user.PhotoBytes.Length == 0)
+            return NotFound();
+
+        return File(
+            user.PhotoBytes,
+            user.PhotoContentType ?? "image/jpeg"
+        );
     }
 }
