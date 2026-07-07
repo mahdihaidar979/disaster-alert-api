@@ -46,6 +46,7 @@ namespace DisasterSystem.API.Controllers
 
             var response = new AuthResponseDto
             {
+                UserId = user.Id,
                 Token = token,
                 Email = user.Email,
                 Name = user.Name,
@@ -80,6 +81,7 @@ namespace DisasterSystem.API.Controllers
 
             var response = new AuthResponseDto
             {
+                UserId = user.Id,
                 Token = token,
                 Email = user.Email,
                 Name = user.Name,
