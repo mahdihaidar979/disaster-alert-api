@@ -384,12 +384,12 @@ namespace DisasterSystem.API.Controllers
                 return;
 
             var users = await _context.Users
-                .Where(u =>
-                    u.Latitude != null &&
-                    u.Longitude != null &&
-                    u.Id != report.UserId &&
-                    !u.IsBanned)
-                .ToListAsync();
+    .Where(u =>
+        u.Role == "User" &&
+        u.Latitude != null &&
+        u.Longitude != null &&
+        !u.IsBanned)
+    .ToListAsync();
 
             var sentTokens = new HashSet<string>();
 
