@@ -17,7 +17,8 @@ builder.Services.AddCors(options =>
         policy
             .WithOrigins(
                 "http://localhost:5173",
-                "https://disaster-alert-api-zup2.onrender.com"
+                "https://disaster-alert-api-zup2.onrender.com",
+                "https://disaster-admin-web.onrender.com"
             )
             .AllowAnyHeader()
             .AllowAnyMethod()
