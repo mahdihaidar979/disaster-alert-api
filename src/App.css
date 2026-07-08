@@ -1,0 +1,398 @@
+/* App.css
+   Keep page-specific component styles here.
+   Most dashboard pages already use inline styles, so this file supports
+   shared app layout classes, old pages, and consistent admin UI helpers.
+*/
+
+/* =========================
+   DESIGN TOKENS
+========================= */
+
+:root {
+  --primary: #0f172a;
+  --secondary: #2563eb;
+  --accent: #0ea5e9;
+  --success: #22c55e;
+  --warning: #f97316;
+  --danger: #ef4444;
+  --purple: #7c3aed;
+
+  --bg: #f5f7fb;
+  --bg-soft: #eef4ff;
+  --surface: rgba(255, 255, 255, 0.94);
+  --surface-solid: #ffffff;
+  --input: #f8fafc;
+  --border: #e2e8f0;
+
+  --text: #0f172a;
+  --muted: #64748b;
+  --light: #94a3b8;
+
+  --shadow-sm: 0 10px 24px rgba(15, 23, 42, 0.06);
+  --shadow-md: 0 18px 40px rgba(15, 23, 42, 0.08);
+  --shadow-lg: 0 24px 60px rgba(15, 23, 42, 0.14);
+
+  --radius-lg: 30px;
+  --radius-md: 22px;
+  --radius-sm: 16px;
+}
+
+/* =========================
+   APP BACKGROUND HELPERS
+========================= */
+
+.page {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  padding: 28px;
+  background: linear-gradient(180deg, var(--bg) 0%, var(--bg-soft) 100%);
+  overflow: hidden;
+}
+
+.page::before {
+  content: "";
+  position: absolute;
+  width: 280px;
+  height: 280px;
+  top: -110px;
+  right: -70px;
+  border-radius: 999px;
+  background: rgba(37, 99, 235, 0.12);
+  pointer-events: none;
+}
+
+.page::after {
+  content: "";
+  position: absolute;
+  width: 240px;
+  height: 240px;
+  bottom: -120px;
+  left: -80px;
+  border-radius: 999px;
+  background: rgba(56, 189, 248, 0.14);
+  pointer-events: none;
+}
+
+.page > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* =========================
+   PAGE HEADER
+========================= */
+
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 22px;
+  margin-bottom: 22px;
+}
+
+.page-title {
+  margin: 0;
+  font-size: 34px;
+  line-height: 1.08;
+  color: var(--text);
+  font-weight: 950;
+  letter-spacing: -0.8px;
+}
+
+.page-subtitle {
+  margin: 8px 0 0;
+  color: var(--muted);
+  font-size: 15px;
+  font-weight: 650;
+  line-height: 1.5;
+}
+
+.page-eyebrow {
+  display: inline-flex;
+  padding: 7px 12px;
+  border-radius: 999px;
+  background: #dbeafe;
+  color: var(--secondary);
+  font-weight: 900;
+  font-size: 12px;
+  margin-bottom: 10px;
+}
+
+/* =========================
+   CARDS
+========================= */
+
+.card,
+.glass-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 22px;
+  box-shadow: var(--shadow-md);
+  backdrop-filter: blur(14px);
+}
+
+.card-compact {
+  padding: 16px;
+  border-radius: var(--radius-md);
+}
+
+.hero-card {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 22px;
+  border-radius: var(--radius-lg);
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: white;
+  box-shadow: 0 24px 50px rgba(37, 99, 235, 0.22);
+}
+
+.hero-icon {
+  width: 68px;
+  height: 68px;
+  border-radius: 24px;
+  display: grid;
+  place-items: center;
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  font-size: 34px;
+  flex-shrink: 0;
+}
+
+/* =========================
+   STATS
+========================= */
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(165px, 1fr));
+  gap: 14px;
+}
+
+.stat-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 18px;
+  border-radius: 26px;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  box-shadow: var(--shadow-sm);
+  backdrop-filter: blur(14px);
+}
+
+.stat-card span {
+  display: block;
+  color: var(--muted);
+  font-weight: 850;
+  font-size: 13px;
+  margin-bottom: 3px;
+}
+
+.stat-card strong {
+  display: block;
+  font-size: 25px;
+  font-weight: 950;
+  line-height: 1;
+}
+
+/* =========================
+   BUTTONS
+========================= */
+
+button {
+  font-family: inherit;
+}
+
+.primary-btn {
+  height: 48px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: 18px;
+  background: var(--primary);
+  color: white;
+  font-weight: 900;
+  cursor: pointer;
+  box-shadow: 0 16px 30px rgba(15, 23, 42, 0.18);
+  transition: 0.18s ease;
+}
+
+.primary-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 20px 34px rgba(15, 23, 42, 0.22);
+}
+
+.danger-btn {
+  height: 48px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: 18px;
+  background: var(--danger);
+  color: white;
+  font-weight: 900;
+  cursor: pointer;
+  box-shadow: 0 16px 30px rgba(239, 68, 68, 0.2);
+}
+
+.secondary-btn {
+  height: 48px;
+  padding: 0 18px;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: white;
+  color: var(--text);
+  font-weight: 900;
+  cursor: pointer;
+}
+
+/* =========================
+   FORMS / FILTERS
+========================= */
+
+.input,
+.textarea,
+select {
+  width: 100%;
+  border: 1px solid var(--border);
+  outline: none;
+  border-radius: 18px;
+  padding: 14px 15px;
+  font-size: 14px;
+  background: var(--input);
+  color: var(--text);
+  font-weight: 750;
+}
+
+.textarea {
+  min-height: 150px;
+  resize: vertical;
+  line-height: 1.55;
+}
+
+.filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.chip {
+  min-height: 42px;
+  border: 1px solid var(--border);
+  background: white;
+  color: var(--text);
+  padding: 0 14px;
+  border-radius: 18px;
+  font-weight: 900;
+  cursor: pointer;
+  transition: 0.18s ease;
+}
+
+.chip:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
+}
+
+.chip-active {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+
+/* =========================
+   TABLES
+========================= */
+
+.table-card {
+  overflow: hidden;
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-md);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th {
+  background: #f1f5f9;
+  text-align: left;
+  padding: 15px;
+  color: #475569;
+  font-size: 13px;
+  text-transform: uppercase;
+  font-weight: 900;
+}
+
+td {
+  padding: 15px;
+  border-top: 1px solid var(--border);
+  color: #334155;
+  font-weight: 650;
+}
+
+.badge {
+  display: inline-flex;
+  padding: 7px 11px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+/* =========================
+   MAP
+========================= */
+
+.map-card {
+  height: calc(100vh - 360px);
+  min-height: 560px;
+  background: var(--surface);
+  border-radius: 34px;
+  padding: 10px;
+  box-shadow: 0 22px 44px rgba(15, 23, 42, 0.1);
+  border: 1px solid var(--border);
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width: 1100px) {
+  .stats-grid {
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  }
+
+  .hero-card {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 850px) {
+  .page {
+    padding: 20px;
+    overflow: visible;
+  }
+
+  .page-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .page-title {
+    font-size: 28px;
+  }
+
+  .card,
+  .glass-card {
+    border-radius: 24px;
+    padding: 18px;
+  }
+
+  .map-card {
+    min-height: 480px;
+  }
+}
