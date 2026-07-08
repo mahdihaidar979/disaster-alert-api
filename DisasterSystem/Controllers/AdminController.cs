@@ -461,6 +461,94 @@ namespace DisasterSystem.API.Controllers
             });
         }
 
+        [HttpPost("reports/create-verified")]
+        [Consumes("multipart/form-data")]
+        public async Task<IActionResult> CreateVerifiedReport([FromForm] CreateReportDto dto)
+        {
+            var admin = GetCurrentAdmin();
+
+            string? imageUrl = null;
+
+            if (dto.Image != null && dto.Image.Length > 0)
+            {
+                var folder = Path.Combine(
+                    Directory.GetCurrentDirectory(),
+                    "wwwroot",
+                    "uploads",
+                    "reports"
+                );
+
+                if (!Directory.Exists(folder))
+                    Directory.CreateDirectory(folder);
+
+                var fileName = $"{Guid.NewGuid()}{Path.GetExtension(dto.Image.FileName)}";
+                var path = Path.Combine(folder, fileName);
+
+                using (var stream = new FileStream(path, FileMode.Create))
+                {
+                    await dto.Image.CopyToAsync(stream);
+                }
+
+                imageUrl = $"/uploads/reports/{fileName}";
+            }
+
+            var report = new Report
+            {
+                UserId = admin.Id,
+                Type = dto.Type,
+                Description = dto.Description,
+                Severity = dto.Severity,
+                Status = "Verified",
+                Score = 0,
+                AiConfidence = 100,
+                AiPrediction = "Verified by Admin",
+                AiReason = "Official report created directly by administrator.",
+                CreatedAt = DateTime.UtcNow,
+                ImageUrl = imageUrl,
+                Location = new NetTopologySuite.Geometries.Point(dto.Longitude, dto.Latitude)
+                {
+                    SRID = 4326
+                }
+            };
+
+            _context.Reports.Add(report);
+            await _context.SaveChangesAsync();
+
+            await _adminLogService.LogAsync(
+                admin.Id,
+                admin.Name,
+                "Create Verified Report",
+                "Report",
+                report.Id,
+                $"Admin created verified report #{report.Id}"
+            );
+
+            await _hubContext.Clients.All.SendAsync(
+                "ReportSubmitted",
+                BuildRealtimeReportPayload(report)
+            );
+
+            await _hubContext.Clients.All.SendAsync("ReceiveAlert", new
+            {
+                report.Id,
+                report.Type,
+                report.Description,
+                report.Severity,
+                report.ImageUrl,
+                Latitude = report.Location.Y,
+                Longitude = report.Location.X,
+                Message = $"✅ Verified admin alert: {report.Type}"
+            });
+
+            await SendNotificationsForVerifiedReport(report);
+
+            return Ok(new
+            {
+                message = "Verified report created successfully.",
+                report = BuildRealtimeReportPayload(report)
+            });
+        }
+
         [HttpDelete("reports/{id}")]
         public async Task<IActionResult> DeleteReport(int id)
         {
