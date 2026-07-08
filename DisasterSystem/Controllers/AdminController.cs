@@ -320,6 +320,7 @@ namespace DisasterSystem.API.Controllers
                     u.Reputation,
                     u.CreatedAt,
                     u.IsBanned,
+                    u.PhotoUrl,
                     ReportsCount = u.Reports.Count()
                 })
                 .ToListAsync();
