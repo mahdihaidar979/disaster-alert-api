@@ -12,14 +12,12 @@ namespace DisasterSystem.API.Data
 
         public DbSet<User> Users => Set<User>();
         public DbSet<Report> Reports => Set<Report>();
-        public DbSet<ReportVote> ReportVotes => Set<ReportVote>();
         public DbSet<DangerZone> DangerZones => Set<DangerZone>();
         public DbSet<Notification> Notifications => Set<Notification>();
         public DbSet<EmergencyCenter> EmergencyCenters => Set<EmergencyCenter>();
         public DbSet<UserLocation> UserLocations => Set<UserLocation>();
         public DbSet<AdminLog> AdminLogs => Set<AdminLog>();
         public DbSet<UserLocation> UserLocation => Set<UserLocation>();
-        public DbSet<SafetyCheckIn> SafetyCheckIns => Set<SafetyCheckIn>();
         public DbSet<ChatMessage> ChatMessages { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -68,28 +66,7 @@ namespace DisasterSystem.API.Data
                     .OnDelete(DeleteBehavior.Cascade);
             });
 
-            modelBuilder.Entity<ReportVote>(entity =>
-            {
-                entity.ToTable("reportvotes");
-
-                entity.HasKey(x => x.Id);
-
-                entity.Property(x => x.Id).HasColumnName("id");
-                entity.Property(x => x.UserId).HasColumnName("userid");
-                entity.Property(x => x.ReportId).HasColumnName("reportid");
-                entity.Property(x => x.Vote).HasColumnName("vote").HasColumnType("integer");
-                entity.Property(x => x.CreatedAt).HasColumnName("createdat");
-
-                entity.HasOne(x => x.User)
-                    .WithMany(x => x.ReportVotes)
-                    .HasForeignKey(x => x.UserId)
-                    .OnDelete(DeleteBehavior.Cascade);
-
-                entity.HasOne(x => x.Report)
-                    .WithMany(x => x.ReportVotes)
-                    .HasForeignKey(x => x.ReportId)
-                    .OnDelete(DeleteBehavior.Cascade);
-            });
+            
 
             modelBuilder.Entity<DangerZone>(entity =>
             {
