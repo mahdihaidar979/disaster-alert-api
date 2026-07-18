@@ -119,7 +119,6 @@ namespace DisasterSystem.API.Controllers
         {
             var reports = await _context.Reports
                 .Include(r => r.User)
-                .Include(r => r.ReportVotes)
                 .AsNoTracking()
                 .Where(r => r.Status == "Pending")
                 .OrderByDescending(r => r.CreatedAt)
@@ -140,7 +139,6 @@ namespace DisasterSystem.API.Controllers
                     Latitude = r.Location != null ? r.Location.Coordinate.Y : 0,
                     Longitude = r.Location != null ? r.Location.Coordinate.X : 0,
                     r.ImageUrl,
-                    VotesCount = r.ReportVotes.Count()
                 })
                 .ToListAsync();
 
@@ -211,7 +209,6 @@ namespace DisasterSystem.API.Controllers
                 Latitude = latitude,
                 Longitude = longitude,
                 report.ImageUrl,
-                VotesCount = report.ReportVotes != null ? report.ReportVotes.Count : 0
             };
         }
 
@@ -220,7 +217,6 @@ namespace DisasterSystem.API.Controllers
         {
             var reports = await _context.Reports
                 .Include(r => r.User)
-                .Include(r => r.ReportVotes)
                 .AsNoTracking()
                 .OrderByDescending(r => r.CreatedAt)
                 .ToListAsync();
@@ -250,7 +246,6 @@ namespace DisasterSystem.API.Controllers
                     Longitude = longitude,
                     LocationName = await GetLocationNameAsync(latitude, longitude),
                     r.ImageUrl,
-                    VotesCount = r.ReportVotes.Count
                 });
             }
 
@@ -267,7 +262,6 @@ namespace DisasterSystem.API.Controllers
 
             var reports = await _context.Reports
                 .Include(r => r.User)
-                .Include(r => r.ReportVotes)
                 .AsNoTracking()
                 .Where(r => r.Status == status)
                 .OrderByDescending(r => r.CreatedAt)
@@ -298,7 +292,6 @@ namespace DisasterSystem.API.Controllers
                     Longitude = longitude,
                     LocationName = await GetLocationNameAsync(latitude, longitude),
                     r.ImageUrl,
-                    VotesCount = r.ReportVotes.Count
                 });
             }
 
@@ -338,7 +331,6 @@ namespace DisasterSystem.API.Controllers
 
             var report = await _context.Reports
                 .Include(r => r.User)
-                .Include(r => r.ReportVotes)
                 .FirstOrDefaultAsync(r => r.Id == id);
 
             if (report == null)
@@ -555,7 +547,6 @@ namespace DisasterSystem.API.Controllers
         {
             var report = await _context.Reports
                 .Include(r => r.User)
-                .Include(r => r.ReportVotes)
                 .FirstOrDefaultAsync(r => r.Id == id);
 
             if (report == null)

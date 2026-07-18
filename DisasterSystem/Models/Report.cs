@@ -21,6 +21,5 @@ namespace DisasterSystem.API.Models
         public DateTime CreatedAt { get; set; }
 
         public User? User { get; set; }
-        public List<ReportVote> ReportVotes { get; set; } = new();
     }
 }

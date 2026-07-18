@@ -41,8 +41,7 @@ namespace DisasterSystem.API.Controllers
                 .AsNoTracking()
                .Where(x =>
     x.Channel == channel &&
-    x.CreatedAt >= expireTime &&
-    !x.IsDeleted)
+    x.CreatedAt >= expireTime)
 
                 .OrderByDescending(x => x.CreatedAt)
                 .Take(100)
@@ -83,9 +82,7 @@ namespace DisasterSystem.API.Controllers
                 Message = dto.Message.Trim(),
                 Channel = channel,
                 CreatedAt = DateTime.UtcNow,
-                IsAdminMessage = role == "Admin",
-                IsDeleted = false,
-                IsPinned = false
+            
             };
 
             _context.ChatMessages.Add(message);
@@ -108,7 +105,6 @@ namespace DisasterSystem.API.Controllers
             if (message == null)
                 return NotFound("Message not found.");
 
-            message.IsDeleted = true;
 
             await _context.SaveChangesAsync();
 
@@ -126,7 +122,6 @@ namespace DisasterSystem.API.Controllers
             if (message == null)
                 return NotFound("Message not found.");
 
-            message.IsPinned = !message.IsPinned;
 
             await _context.SaveChangesAsync();
 
@@ -159,9 +154,6 @@ namespace DisasterSystem.API.Controllers
                 Message = dto.Message.Trim(),
                 Channel = channel,
                 CreatedAt = DateTime.UtcNow,
-                IsAdminMessage = true,
-                IsDeleted = false,
-                IsPinned = true
             };
 
             _context.ChatMessages.Add(message);
